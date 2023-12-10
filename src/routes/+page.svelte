@@ -1,5 +1,6 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<h1 class="text-2xl">Bitcoin Paper Wallet</h1>
 
-<div class="text-red-600">HI</div>
-hoo
+<div class="space-y-5">
+<button class="p-4 bg-black text-white rounded-2xl">Create new wallet</button>
+<button class="p-4 bg-black text-white rounded-2xl">Scan a QR code</button>
+</div>
