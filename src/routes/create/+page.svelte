@@ -10,7 +10,6 @@
 	let ECPair = ECPairFactory(ecc);
 	let network = networks[PUBLIC_NETWORK];
 	let address, enc;
-	$: if (form) ({ address, enc } = form);
 	let copied, password;
 
 	let copy = (t) => {
