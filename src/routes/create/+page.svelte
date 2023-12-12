@@ -9,7 +9,6 @@
 
 	let ECPair = ECPairFactory(ecc);
 	let network = networks[PUBLIC_NETWORK];
-	export let form;
 	let address, enc;
 	$: if (form) ({ address, enc } = form);
 	let copied, password;

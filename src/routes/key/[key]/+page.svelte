@@ -130,7 +130,6 @@
 	};
 
 	export let data;
-	export let form;
 
 	let { address, balance, key } = data;
 	$: ({ address, balance, key } = data);
