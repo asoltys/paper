@@ -2,15 +2,17 @@
 	import { enhance } from '$app/forms';
 
 	export let data;
-  export let form;
+	export let form;
 
 	let { address, balance } = data;
+	$: ({ address, balance } = data);
+
 	let amount = 0.01,
 		destination = 'bcrt1qduk6k7xqm265vhcyu9wfz92wja4hpqtdhc2vmk';
 </script>
 
 {#if form}
-  <div class="break-all">{form.hex}</div>
+	<div class="break-all">{form.hex}</div>
 {/if}
 
 <form class="text-center space-y-5" method="POST" use:enhance>
@@ -39,14 +41,13 @@
 		<input
 			name="destination"
 			class="text-2xl p-4 rounded-2xl"
-			placeholder="Destination address"
+			placeholder="Address"
 			bind:value={destination}
 		/>
 	</div>
 
 	<button
 		type="submit"
-		href="/create"
 		class="mx-auto flex gap-2 w-full md:w-60 p-4 bg-white border rounded-2xl justify-center"
 	>
 		<div class="my-auto">Withdraw</div>

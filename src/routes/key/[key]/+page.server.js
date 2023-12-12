@@ -1,7 +1,9 @@
 import { address as Address, networks, payments, Psbt } from 'bitcoinjs-lib';
+import wif from 'wif';
 import * as ecc from 'tiny-secp256k1';
 import { ECPairFactory } from 'ecpair';
 import { PUBLIC_NETWORK, PUBLIC_EXPLORER } from '$env/static/public';
+import { redirect } from "@sveltejs/kit";
 import reverse from 'buffer-reverse';
 
 let ECPair = ECPairFactory(ecc);
@@ -10,7 +12,7 @@ let network = networks[PUBLIC_NETWORK];
 
 let getAddress = (key) =>
 	payments.p2pkh({
-		pubkey: ECPair.fromWIF(key, network).publicKey,
+		pubkey: ECPair.fromPrivateKey(Buffer.from(wif.decode(key).privateKey)).publicKey,
 		network
 	}).address;
 
@@ -35,21 +37,20 @@ export async function load({ params: { key } }) {
 }
 
 export const actions = {
-	default: async ({ params: { key }, request }) => {
+	default: async ({ params: { key }, request, url }) => {
 		let form = await request.formData();
 		let destination = form.get('destination');
 		let amount = Math.round(form.get('amount') * sats);
 		let address = getAddress(key);
 
 		let utxos = await getUtxos(address);
-		console.log('UTXOS', utxos);
 
 		let i = 0;
 		let total = 0;
 		while (total < amount) {
 			total += utxos[i].value;
 			i++;
-      if (i > utxos.length) throw new Error("insufficient funds")
+			if (i > utxos.length) throw new Error('insufficient funds');
 		}
 
 		let change = total - amount;
@@ -74,8 +75,9 @@ export const actions = {
 			value: change
 		});
 
+		let rate = await getFeeRate();
 		while (i <= utxos.length) {
-			let fee = (await getFeeRate()) * p.__CACHE.__TX.virtualSize();
+			let fee = rate * p.__CACHE.__TX.virtualSize();
 
 			if (fee <= change) {
 				let q = new Psbt();
@@ -121,11 +123,16 @@ export const actions = {
 		}
 
 		let hex = p
-			.signAllInputs(ECPair.fromWIF(key, network))
+			.signAllInputs(ECPair.fromPrivateKey(Buffer.from(wif.decode(key).privateKey), network))
 			.finalizeAllInputs()
 			.extractTransaction()
 			.toHex();
 
-		return { hex };
+		let t = await fetch(`${PUBLIC_EXPLORER}/tx`, {
+			method: 'POST',
+			body: hex
+		}).then((r) => r.text());
+
+		throw redirect(303, url.pathname);
 	}
 };

@@ -14,7 +14,8 @@
 	});
 </script>
 
-<div class="container mx-auto bg-gray-100 p-8 text-xl shadow-lg mt-10 rounded-2xl">
+<div class="container mx-auto bg-gray-100 p-8 text-xl shadow-lg mt-10 rounded-2xl space-y-5">
+	<a href="/" class="text-2xl">Bitcoin Paper Wallet</a>
 	<slot />
 </div>
 
