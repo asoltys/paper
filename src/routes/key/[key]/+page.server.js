@@ -1,9 +1,9 @@
 import { address as Address, networks, payments, Psbt } from 'bitcoinjs-lib';
 import wif from 'wif';
-import * as ecc from 'tiny-secp256k1';
+import * as ecc from '@bitcoinerlab/secp256k1';
 import { ECPairFactory } from 'ecpair';
 import { PUBLIC_NETWORK, PUBLIC_EXPLORER } from '$env/static/public';
-import { redirect } from "@sveltejs/kit";
+import { redirect } from '@sveltejs/kit';
 import reverse from 'buffer-reverse';
 
 let ECPair = ECPairFactory(ecc);

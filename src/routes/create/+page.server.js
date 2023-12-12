@@ -1,6 +1,6 @@
 import { networks, payments } from 'bitcoinjs-lib';
 import bip38 from 'bip38';
-import * as ecc from 'tiny-secp256k1';
+import * as ecc from '@bitcoinerlab/secp256k1';
 import { ECPairFactory } from 'ecpair';
 import { PUBLIC_NETWORK, PUBLIC_EXPLORER } from '$env/static/public';
 
