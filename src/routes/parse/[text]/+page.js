@@ -7,7 +7,13 @@ export async function load({ params }) {
 
 	if (validate(text)) throw redirect(307, `/address/${text}`);
 	if (text.startsWith('6')) throw redirect(307, `/decrypt/${text}`);
-	if (wif.decode(text)) throw redirect(307, `/key/${text}`);
+
+	let isKey = false;
+	try {
+		wif.decode(text);
+		isKey = true;
+	} catch (e) {}
+    if (isKey) throw redirect(307, `/key/${text}`);
 
 	return { text };
 }
