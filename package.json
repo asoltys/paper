@@ -18,15 +18,18 @@
     "bip38": "^3.1.1",
     "bitcoin-address-validation": "^2.2.3",
     "bitcoinjs-lib": "^6.1.5",
+    "buffer": "^6.0.3",
     "buffer-reverse": "^1.0.1",
     "ecpair": "^2.1.0",
     "prettier": "^3.0.0",
     "prettier-plugin-svelte": "^3.0.0",
     "qr-scanner": "^1.4.2",
+    "setimmediate": "^1.0.5",
     "svelte": "^4.2.7",
     "svelte-preprocess": "^5.1.1",
     "tailwindcss": "^3.3.6",
     "vite": "^4.4.2",
+    "vite-plugin-node-polyfills": "^0.17.0",
     "wif": "^4.0.0"
   },
   "type": "module"

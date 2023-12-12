@@ -1,4 +1,4 @@
-  import { PUBLIC_EXPLORER } from '$env/static/public';
+import { PUBLIC_EXPLORER } from '$env/static/public';
 const sats = 100000000;
 
 export async function load({ params: { address } }) {
