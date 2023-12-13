@@ -15,7 +15,7 @@
 	};
 
 	let getFeeRate = () =>
-		network.bech32 === 'bcrt' ? 50 : fetch(`${api}/v1/fees/recommended`).then((r) => r.text());
+    network.bech32 === 'bcrt' ? { halfHourFee: 50 } : fetch(`${api}/v1/fees/recommended`).then((r) => r.text());
 
 	let txid;
 	let submit = async () => {
@@ -45,7 +45,7 @@
 		tx.addOutputAddress(destination, amount, network);
 		tx.addOutputAddress(address, change, network);
 
-		let rate = await getFeeRate();
+    let { halfHourFee: rate } = await getFeeRate();
 		while (i <= utxos.length) {
 			let fee = BigInt(rate) * BigInt(tx.unsignedTx.length);
 
