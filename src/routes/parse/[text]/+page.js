@@ -1,6 +1,7 @@
+import * as btc from '@scure/btc-signer';
 import { validate } from 'bitcoin-address-validation';
 import { redirect } from '@sveltejs/kit';
-import wif from 'wif';
+import { network } from '$lib';
 
 export async function load({ params }) {
 	let { text } = params;
@@ -10,10 +11,12 @@ export async function load({ params }) {
 
 	let isKey = false;
 	try {
-		wif.decode(text);
+      btc.WIF(network).decode(text);
 		isKey = true;
-	} catch (e) {}
-    if (isKey) throw redirect(307, `/key/${text}`);
+	} catch (e) {
+		console.log(e);
+	}
+	if (isKey) throw redirect(307, `/key/${text}`);
 
 	return { text };
 }

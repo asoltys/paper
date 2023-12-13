@@ -1,14 +1,10 @@
 <script>
-	import { Buffer } from 'buffer';
-	import { networks, payments } from 'bitcoinjs-lib';
+	import { tick } from 'svelte';
+	import * as btc from '@scure/btc-signer';
+	import { secp256k1 } from '@noble/curves/secp256k1';
 	import bip38 from 'bip38';
-	import * as ecc from '@bitcoinerlab/secp256k1';
-	import { ECPairFactory } from 'ecpair';
-	import { PUBLIC_NETWORK, PUBLIC_EXPLORER } from '$env/static/public';
-	import 'setimmediate';
+	import { network } from '$lib';
 
-	let ECPair = ECPairFactory(ecc);
-	let network = networks[PUBLIC_NETWORK];
 	let address, enc;
 	let copied, password;
 
@@ -18,33 +14,18 @@
 		navigator.clipboard.writeText(t);
 	};
 
+	let submitted;
 	let submit = async () => {
-		let key = ECPair.makeRandom(network);
-
-		({ address } = payments.p2pkh({
-			pubkey: key.publicKey,
-			network
-		}));
-
-		enc = await bip38.encryptAsync(key.privateKey, true, password, progress);
-	};
-
-	let percent = 0;
-	let progress = (status) => {
-		({ percent } = status);
+		submitted = true;
+		await tick();
+		let privkey = secp256k1.utils.randomPrivateKey();
+		let pubkey = secp256k1.getPublicKey(privkey);
+		address = btc.getAddress('pkh', privkey, network);
+		enc = await bip38.encryptAsync(privkey, true, password);
 	};
 </script>
 
-{#if percent && percent < 99}
-	<div class="w-full bg-white rounded-full h-2.5">
-		<div
-			class="bg-gray-400 h-2.5 rounded-full transition-all ease-in-out duration-300"
-			style="width: {percent}%"
-		></div>
-	</div>
-{/if}
-
-{#if enc}
+{#if submitted}
 	<div>
 		<div class="text-gray-400">Address</div>
 		<button type="button" on:click={() => copy(address)}>{address}</button>
@@ -72,8 +53,6 @@
 
 		<button
 			type="submit"
-			disabled={!!percent}
-			class:text-gray-300={!!percent}
 			class="mx-auto flex gap-2 w-full md:w-60 p-4 bg-white border rounded-2xl justify-center"
 		>
 			<div class="my-auto">Submit</div>
