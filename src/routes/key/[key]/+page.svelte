@@ -19,7 +19,7 @@
 
 	let txid;
 	let submit = async () => {
-		let amount = BigInt(decimal * sats);
+		let amount = BigInt(Math.round(decimal * sats));
 		if (decimal > balance) throw new Error('insufficient funds');
 
 		let i = 0;
