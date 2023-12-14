@@ -1,5 +1,6 @@
 <script>
 	import '../app.css';
+	import { api } from '$lib';
 	import { onNavigate } from '$app/navigation';
 
 	onNavigate((navigation) => {
@@ -16,7 +17,8 @@
 
 <div class="container mx-auto bg-gray-100 p-8 text-xl shadow-lg mt-10 rounded-2xl space-y-5">
 	<a href="/" class="text-2xl">Bitcoin Paper Wallet</a>
-	<slot />
+  cRCjcoiCjKsySdS6UcvYugE4xDgie69zwVtv6aknm3XjMkbMAQGh
+    <slot />
 </div>
 
 <style>

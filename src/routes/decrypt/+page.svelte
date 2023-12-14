@@ -1,34 +1,32 @@
 <script>
+	import { onMount } from 'svelte';
 	import * as btc from '@scure/btc-signer';
 	import bip38 from 'bip38';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import { network } from '$lib';
-
-	let submitting;
-	let submit = async () => {
-		submitting = true;
-		let { text } = $page.params;
-		let r = await bip38.decryptAsync(text, password);
-		let key = btc.WIF(network).encode(r.privateKey);
-		goto(`/key/${key}`);
-	};
+	import { address, enc, key, network } from '$lib';
+	import Password from '$lib/Password.svelte';
 
 	let password;
+	let submitting;
+
+	let submit = async () => {
+		submitting = true;
+      let r = await bip38.decryptAsync($enc, password);
+		$address = btc.getAddress('pkh', r.privateKey, network);
+		$key = btc.WIF(network).encode(r.privateKey);
+		goto('/spend');
+	};
+
+	onMount(() => {
+		if (!$enc) goto('/');
+	});
 </script>
 
 {#if !submitting}
 	<form class="text-center space-y-5" on:submit|preventDefault={submit}>
-		<div>
-			<div class="text-gray-400">Password</div>
-			<input
-				name="password"
-				class="text-2xl p-4 rounded-2xl"
-				placeholder="Password"
-				bind:value={password}
-			/>
-		</div>
-
+		{$enc}
+		<Password bind:password />
 		<button
 			type="submit"
 			class="mx-auto flex gap-2 w-full md:w-60 p-4 bg-white border rounded-2xl justify-center"

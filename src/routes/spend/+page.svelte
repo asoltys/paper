@@ -1,10 +1,20 @@
 <script>
+	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
 	import * as btc from '@scure/btc-signer';
-	import { api, network } from '$lib';
+	import { api, address, key, network } from '$lib';
 	import { redirect } from '@sveltejs/kit';
 	import { page } from '$app/stores';
 	import { invalidateAll } from '$app/navigation';
 	import { isUint8Array, hexToUint8Array, uint8ArrayToHex } from 'uint8array-extras';
+
+	import Address from '$lib/Address.svelte';
+
+	let balance, utxos;
+
+	onMount(() => {
+		if (!$key) goto('/');
+	});
 
 	let sats = 100000000;
 
@@ -45,7 +55,7 @@
 		}
 
 		tx.addOutputAddress(destination, amount, network);
-		tx.addOutputAddress(address, change, network);
+		tx.addOutputAddress($address, change, network);
 
 		let { halfHourFee: rate } = await getFeeRate();
 		while (i <= utxos.length) {
@@ -60,7 +70,7 @@
 					q.addInput({ ...input, nonWitnessUtxo });
 				}
 				q.addOutput(tx.getOutput(0));
-				q.addOutputAddress(address, change - fee, network);
+				q.addOutputAddress($address, change - fee, network);
 				tx = q;
 
 				break;
@@ -92,7 +102,7 @@
 			}
 		}
 
-		let privkey = btc.WIF(network).decode(key);
+		let privkey = btc.WIF(network).decode($key);
 		for (let i = 0; i < tx.inputsLength; i++) {
 			tx.signIdx(privkey, 0);
 		}
@@ -106,9 +116,6 @@
 
 	export let data;
 
-	let { address, balance, key, utxos } = data;
-	$: ({ address, balance, key, utxos } = data);
-
 	let decimal, destination;
 	// let decimal = 0.01,
 	// 	destination = 'bcrt1qduk6k7xqm265vhcyu9wfz92wja4hpqtdhc2vmk';
@@ -119,15 +126,7 @@
 	<div class="break-all text-center">{txid}</div>
 {:else}
 	<form class="text-center space-y-5" on:submit|preventDefault={submit}>
-		<div>
-			<div class="text-gray-400">Address</div>
-			<div class="text-2xl">{address}</div>
-		</div>
-
-		<div>
-			<div class="text-gray-400">Balance</div>
-			<div class="text-4xl">{balance}</div>
-		</div>
+		<Address bind:balance bind:utxos />
 
 		<div>
 			<div class="text-gray-400">Withdraw</div>

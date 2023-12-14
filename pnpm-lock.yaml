@@ -8,6 +8,9 @@ devDependencies:
   '@noble/curves':
     specifier: ^1.3.0
     version: 1.3.0
+  '@paulmillr/qr':
+    specifier: ^0.1.1
+    version: 0.1.1
   '@scure/btc-signer':
     specifier: ^1.1.1
     version: 1.1.1
@@ -339,6 +342,10 @@ packages:
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.15.0
+    dev: true
+
+  /@paulmillr/qr@0.1.1:
+    resolution: {integrity: sha512-lwGH6AvdzirFYxDi5vtCtAHcvuFpvfGhLi4eUiriTwTxnpoXLHT88faw+y6ABP08Z+Yfqx0GB5ai49F6iW8s9Q==}
     dev: true
 
   /@polka/url@1.0.0-next.24:
