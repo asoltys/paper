@@ -23,6 +23,10 @@
 	<slot />
 </div>
 
+<div class="flex my-4">
+  <a href="https://github.com/asoltys/paper" class="mx-auto">Source code</a>
+</div>
+
 <style>
 	@keyframes fade-in {
 		from {
