@@ -69,8 +69,7 @@
 	};
 
 	onDestroy(() => {
-    if (stream)
-      for (let t of stream.getTracks()) t.stop();
+		if (stream) for (let t of stream.getTracks()) t.stop();
 		player?.pause();
 	});
 </script>
