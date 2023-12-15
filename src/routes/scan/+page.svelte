@@ -5,8 +5,6 @@
 	import decodeQR from '@paulmillr/qr/decode.js';
 	import { parse } from '$lib';
 
-	let back = () => browser && (history.length ? history.go(-1) : goto('/'));
-
 	let canvas, scanner, player, overlay;
 
 	const SLEEP_MS = 25;
@@ -77,7 +75,9 @@
 </div>
 
 <div class="flex w-full mb-4">
-	<button class="mx-auto border p-4 rounded-2xl bg-white" on:click={back}> Cancel </button>
+  <a href="/">
+	<button class="mx-auto border p-4 rounded-2xl bg-white"> Cancel </button>
+  </a>
 </div>
 
 <style>
