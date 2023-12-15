@@ -24,6 +24,14 @@
 		minimumFee: 'Slowest'
 	};
 
+	key.subscribe(async (k) => {
+		if (!k) return;
+		let a = btc.getAddress('pkh', btc.WIF(network).decode(text), network);
+		let u = await fetch(`${api}/address/${a}/utxo`).then((r) => r.json());
+		let b = u.reduce((a, b) => a + b.value, 0) / sats;
+		if (b) $address = a;
+	});
+
 	onMount(async () => {
 		if (!$key) goto('/');
 
@@ -146,10 +154,10 @@
 </script>
 
 {#if txid}
-  <div>
-	<div class="text-gray-400 text-center">Txid</div>
-	<div class="text-2xl break-all text-center">{txid}</div>
-  </div>
+	<div>
+		<div class="text-gray-400 text-center">Txid</div>
+		<div class="text-2xl break-all text-center">{txid}</div>
+	</div>
 {:else}
 	<form class="text-center space-y-5" on:submit|preventDefault={submit}>
 		<Address bind:balance bind:utxos />

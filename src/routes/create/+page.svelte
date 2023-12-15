@@ -22,7 +22,7 @@
 
 		let opts = { scale: 4 };
 
-		$address = btc.getAddress('pkh', privkey, network);
+		$address = btc.getAddress('wpkh', privkey, network);
 		$enc = await bip38.encryptAsync(privkey, true, password);
 
 		draw(addressCanvas, encodeQR($address, 'raw', opts));

@@ -38,7 +38,7 @@ export let parse = (text) => {
 
 	let isKey = false;
 	try {
-		address.set(btc.getAddress('pkh', btc.WIF(network).decode(text), network));
+		address.set(btc.getAddress('wpkh', btc.WIF(network).decode(text), network));
 		key.set(text);
 		goto(`/spend`);
 	} catch (e) {
