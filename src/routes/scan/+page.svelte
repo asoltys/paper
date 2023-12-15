@@ -63,8 +63,6 @@
 			await sleep(SLEEP_MS);
 		}
 	};
-
-	onDestroy(() => player?.stop());
 </script>
 
 <div class="flex w-full justify-center">
@@ -75,9 +73,7 @@
 </div>
 
 <div class="flex w-full mb-4">
-  <a href="/">
-	<button class="mx-auto border p-4 rounded-2xl bg-white"> Cancel </button>
-  </a>
+	<a href="/" class="mx-auto border p-4 rounded-2xl bg-white">Cancel</a>
 </div>
 
 <style>
