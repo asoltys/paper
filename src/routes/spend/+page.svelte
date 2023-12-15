@@ -26,7 +26,7 @@
 
 	key.subscribe(async (k) => {
 		if (!k) return;
-		let a = btc.getAddress('pkh', btc.WIF(network).decode(text), network);
+		let a = btc.getAddress('pkh', btc.WIF(network).decode(k), network);
 		let u = await fetch(`${api}/address/${a}/utxo`).then((r) => r.json());
 		let b = u.reduce((a, b) => a + b.value, 0) / sats;
 		if (b) $address = a;
