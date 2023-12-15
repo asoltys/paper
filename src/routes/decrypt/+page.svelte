@@ -25,7 +25,11 @@
 
 {#if !submitting}
 	<form class="text-center space-y-5" on:submit|preventDefault={submit}>
-		{$enc}
+	<div>
+		<div class="text-gray-400">Decrypting Key</div>
+		<div class="text-2xl">{$enc}</div>
+	</div>
+
 		<Password bind:password />
 		<button
 			type="submit"

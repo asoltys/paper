@@ -117,6 +117,14 @@
 	export let data;
 
 	let decimal, destination;
+	$: max = (balance || 0 / sats).toFixed(8);
+
+	let format = () => {
+    if (decimal > max) decimal = max;
+    if (decimal < 0) decimal = 0;
+		decimal = decimal.toFixed(8);
+	};
+
 	// let decimal = 0.01,
 	// 	destination = 'bcrt1qduk6k7xqm265vhcyu9wfz92wja4hpqtdhc2vmk';
 </script>
@@ -130,12 +138,21 @@
 
 		<div>
 			<div class="text-gray-400">Withdraw</div>
-			<input class="text-2xl p-4 rounded-2xl" placeholder="Amount" bind:value={decimal} />
+			<input
+				type="number"
+				step="0.0001"
+				min={0}
+				{max}
+				class="text-2xl p-4 rounded-2xl w-md"
+				placeholder="BTC"
+				on:change={format}
+				bind:value={decimal}
+			/>
 		</div>
 
 		<div>
 			<div class="text-gray-400">To</div>
-			<input class="text-2xl p-4 rounded-2xl" placeholder="Address" bind:value={destination} />
+			<input class="text-2xl p-4 rounded-2xl w-full max-w-2xl" placeholder="Address" bind:value={destination} />
 		</div>
 
 		<button

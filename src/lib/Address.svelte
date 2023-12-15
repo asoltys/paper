@@ -22,6 +22,6 @@
 
 	<div>
 		<div class="text-gray-400">Balance</div>
-		<div class="text-4xl">{typeof balance === 'undefined' ? '-' : balance}</div>
+		<div class="text-2xl">{typeof balance === 'undefined' ? '-' : balance} BTC</div>
 	</div>
 </div>
