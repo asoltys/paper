@@ -26,7 +26,7 @@
 {#if !submitting}
 	<form class="text-center space-y-5" on:submit|preventDefault={submit}>
 		<div>
-			<div class="text-gray-400">Decrypting Key</div>
+			<div class="text-gray-400">Encrypted Key</div>
 			<div class="text-2xl break-all">{$enc}</div>
 		</div>
 
