@@ -165,10 +165,6 @@
 		<div>
 			<div class="text-gray-400">Withdraw</div>
 			<input
-				type="number"
-				step="0.0001"
-				min={0}
-				{max}
 				class="text-2xl p-4 rounded-2xl w-full max-w-xl"
 				placeholder="BTC"
 				on:change={format}
