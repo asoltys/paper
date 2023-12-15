@@ -11,6 +11,8 @@
 
 	import Address from '$lib/Address.svelte';
 
+	let sats = 100000000;
+
 	let balance,
 		fees = {},
 		rate,
@@ -44,7 +46,6 @@
 		rate = fees['halfHourFee'];
 	});
 
-	let sats = 100000000;
 
 	let getHex = async (txid) => {
 		if (isUint8Array(txid)) txid = uint8ArrayToHex(txid);
@@ -141,16 +142,13 @@
 	let decimal;
 	let destination = '';
 
-	$: max = (balance || 0) / sats;
+	$: max = (balance || 0)
 
 	let format = () => {
 		if (decimal > max) decimal = max;
 		if (decimal < 0) decimal = 0;
 		decimal = parseFloat(decimal).toFixed(8);
 	};
-
-	// let decimal = 0.01,
-	// 	destination = 'bcrt1qduk6k7xqm265vhcyu9wfz92wja4hpqtdhc2vmk';
 </script>
 
 {#if txid}
