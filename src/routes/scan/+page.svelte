@@ -27,6 +27,9 @@
 			const { height, width } = getSize(player);
 			canvas.width = width;
 			canvas.height = height;
+
+			overlay.width = width;
+			overlay.height = height;
 			ctx = { context: canvas.getContext('2d'), height, width };
 			overlayLoop();
 		});
@@ -34,8 +37,8 @@
 		const stream = await navigator.mediaDevices.getUserMedia({
 			video: {
 				height: window.screen.height,
-        width: window.screen.width,
-        facingMode: 'environment'
+				width: window.screen.width,
+				facingMode: 'environment'
 			}
 		});
 
@@ -63,16 +66,14 @@
 		}
 	};
 
-	// onDestroy(() => player?.stop());
+	onDestroy(() => player?.stop());
 </script>
 
-<div class="flex w-full mb-4 px-4">
-	<div class="bg-white mx-auto rounded-3xl">
-		<video
-			bind:this={player}
-			class="border-4 rounded-3xl border-white md:max-w-[600px] !max-h-[80vh] !min-w-[300px] shadow-lg"
-		/>
-	</div>
+<div class="flex w-full justify-center">
+	<video
+		bind:this={player}
+		class="border-4 rounded-3xl border-white shadow-lg w-[600px] max-w-screen mx-auto"
+	/>
 </div>
 
 <div class="flex w-full mb-4">
