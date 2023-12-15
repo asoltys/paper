@@ -11,7 +11,7 @@
 	const TIMEOUT_MS = 500;
 
 	let lastDetect = Date.now();
-	let ctx;
+	let ctx, stream;
 
 	const getSize = (img) => ({
 		width: +getComputedStyle(img).width.split('px')[0],
@@ -22,17 +22,21 @@
 		canvas = document.createElement('canvas');
 
 		player.addEventListener('play', () => {
+			if (!(player && overlay)) return;
+
 			const { height, width } = getSize(player);
+
 			canvas.width = width;
 			canvas.height = height;
 
 			overlay.width = width;
 			overlay.height = height;
+
 			ctx = { context: canvas.getContext('2d'), height, width };
 			overlayLoop();
 		});
 
-		const stream = await navigator.mediaDevices.getUserMedia({
+		stream = await navigator.mediaDevices.getUserMedia({
 			video: {
 				height: window.screen.height,
 				width: window.screen.width,
@@ -63,6 +67,12 @@
 			await sleep(SLEEP_MS);
 		}
 	};
+
+	onDestroy(() => {
+    if (stream)
+      for (let t of stream.getTracks()) t.stop();
+		player?.pause();
+	});
 </script>
 
 <div class="flex w-full justify-center">
