@@ -1,19 +1,14 @@
 <script>
+	import validate from 'bitcoin-address-validation';
 	import { focus, parse } from '$lib';
-	let text;
-	let submit = () => parse(text);
+  import Input from "$lib/Input.svelte"
+
+	let value = '';
+	let submit = () => parse(value);
 </script>
 
 <form class="text-center space-y-5" on:submit|preventDefault={submit}>
-	<div>
-		<input
-			use:focus
-			name="text"
-			class="text-2xl p-4 rounded-2xl w-full"
-			placeholder="Address or key"
-			bind:value={text}
-		>
-	</div>
+	<Input bind:value placeholder="Address or key" />
 
 	<button
 		type="submit"

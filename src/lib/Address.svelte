@@ -16,7 +16,7 @@
 <div class="text-center space-y-5">
 	<div>
 		<div class="text-gray-400">Address</div>
-		<div class="text-2xl">{$address || ''}</div>
+		<div class="text-2xl break-all">{$address || ''}</div>
 		<!-- {#if $key}<div class="text-lg">{$key}</div>{/if} -->
 	</div>
 

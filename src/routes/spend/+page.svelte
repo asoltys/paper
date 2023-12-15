@@ -7,13 +7,33 @@
 	import { page } from '$app/stores';
 	import { invalidateAll } from '$app/navigation';
 	import { isUint8Array, hexToUint8Array, uint8ArrayToHex } from 'uint8array-extras';
+	import Input from '$lib/Input.svelte';
 
 	import Address from '$lib/Address.svelte';
 
-	let balance, utxos;
+	let balance,
+		fees = {},
+		rate,
+		utxos;
 
-	onMount(() => {
+	let feeNames = {
+		fastestFee: 'Fastest',
+		halfHourFee: 'Fast',
+		hourFee: 'Medium',
+		economyFee: 'Slow',
+		minimumFee: 'Slowest'
+	};
+
+	onMount(async () => {
 		if (!$key) goto('/');
+
+		if (network.bech32 === 'bcrt') {
+			fees = { fastestFee: 281, halfHourFee: 271, hourFee: 256, economyFee: 44, minimumFee: 22 };
+		} else {
+			fees = await fetch(`${api}/v1/fees/recommended`).then((r) => r.json());
+		}
+
+		rate = fees['halfHourFee'];
 	});
 
 	let sats = 100000000;
@@ -23,11 +43,6 @@
 		let hex = await fetch(`${api}/tx/${txid}/hex`).then((r) => r.text());
 		return hexToUint8Array(hex);
 	};
-
-	let getFeeRate = () =>
-		network.bech32 === 'bcrt'
-			? { halfHourFee: 50 }
-			: fetch(`${api}/v1/fees/recommended`).then((r) => r.json());
 
 	let txid;
 	let submit = async () => {
@@ -57,7 +72,6 @@
 		tx.addOutputAddress(destination, amount, network);
 		tx.addOutputAddress($address, change, network);
 
-		let { halfHourFee: rate } = await getFeeRate();
 		while (i <= utxos.length) {
 			let fee = BigInt(rate) * BigInt(tx.unsignedTx.length);
 
@@ -116,12 +130,14 @@
 
 	export let data;
 
-	let decimal, destination;
+	let decimal;
+	let destination = '';
+
 	$: max = (balance || 0 / sats).toFixed(8);
 
 	let format = () => {
-    if (decimal > max) decimal = max;
-    if (decimal < 0) decimal = 0;
+		if (decimal > max) decimal = max;
+		if (decimal < 0) decimal = 0;
 		decimal = decimal.toFixed(8);
 	};
 
@@ -130,8 +146,10 @@
 </script>
 
 {#if txid}
-	<h1 class="text-2xl text-center">Withrawal Submitted!</h1>
-	<div class="break-all text-center">{txid}</div>
+  <div>
+	<div class="text-gray-400 text-center">Txid</div>
+	<div class="text-2xl break-all text-center">{txid}</div>
+  </div>
 {:else}
 	<form class="text-center space-y-5" on:submit|preventDefault={submit}>
 		<Address bind:balance bind:utxos />
@@ -143,7 +161,7 @@
 				step="0.0001"
 				min={0}
 				{max}
-				class="text-2xl p-4 rounded-2xl w-md"
+				class="text-2xl p-4 rounded-2xl w-full max-w-xl"
 				placeholder="BTC"
 				on:change={format}
 				bind:value={decimal}
@@ -152,7 +170,16 @@
 
 		<div>
 			<div class="text-gray-400">To</div>
-			<input class="text-2xl p-4 rounded-2xl w-full max-w-2xl" placeholder="Address" bind:value={destination} />
+			<Input bind:value={destination} placeholder="Address" />
+		</div>
+
+		<div>
+			<div class="text-gray-400">Speed</div>
+			<select bind:value={rate} class="text-2xl bg-white p-4 rounded-2xl w-full max-w-xl">
+				{#each Object.keys(fees) as fee}
+					<option value={fees[fee]}>{feeNames[fee]} - {fees[fee]} sats/vbyte</option>
+				{/each}
+			</select>
 		</div>
 
 		<button

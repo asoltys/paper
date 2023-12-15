@@ -1,4 +1,4 @@
-<div class="flex flex-wrap gap-2">
+<div class="flex flex-wrap gap-2 justify-center">
 	<a
 		href="/create"
 		class="flex gap-2 w-full md:w-60 p-4 bg-white border rounded-2xl justify-center"

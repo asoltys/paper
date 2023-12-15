@@ -12,7 +12,7 @@
 
 	let submit = async () => {
 		submitting = true;
-      let r = await bip38.decryptAsync($enc, password);
+		let r = await bip38.decryptAsync($enc, password);
 		$address = btc.getAddress('pkh', r.privateKey, network);
 		$key = btc.WIF(network).encode(r.privateKey);
 		goto('/spend');
@@ -25,10 +25,10 @@
 
 {#if !submitting}
 	<form class="text-center space-y-5" on:submit|preventDefault={submit}>
-	<div>
-		<div class="text-gray-400">Decrypting Key</div>
-		<div class="text-2xl">{$enc}</div>
-	</div>
+		<div>
+			<div class="text-gray-400">Decrypting Key</div>
+			<div class="text-2xl break-all">{$enc}</div>
+		</div>
 
 		<Password bind:password />
 		<button
