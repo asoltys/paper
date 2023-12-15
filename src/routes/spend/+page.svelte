@@ -141,12 +141,12 @@
 	let decimal;
 	let destination = '';
 
-	$: max = (balance || 0 / sats).toFixed(8);
+	$: max = (balance || 0) / sats;
 
 	let format = () => {
 		if (decimal > max) decimal = max;
 		if (decimal < 0) decimal = 0;
-		decimal = decimal.toFixed(8);
+		decimal = parseFloat(decimal).toFixed(8);
 	};
 
 	// let decimal = 0.01,

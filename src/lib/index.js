@@ -41,9 +41,7 @@ export let parse = (text) => {
 		address.set(btc.getAddress('wpkh', btc.WIF(network).decode(text), network));
 		key.set(text);
 		goto(`/spend`);
-	} catch (e) {
-		console.log(e);
-	}
+	} catch (e) {}
 };
 
 export let focus = (el) => browser && screen.width > 1280 && setTimeout(() => el.focus(), 1);
