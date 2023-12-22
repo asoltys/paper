@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import * as btc from '@scure/btc-signer';
-	import bip38 from 'bip38';
+  import { decryptAsync } from 'bip38';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { address, enc, key, network } from '$lib';
@@ -12,7 +12,7 @@
 
 	let submit = async () => {
 		submitting = true;
-		let r = await bip38.decryptAsync($enc, password);
+		let r = await decryptAsync($enc, password);
 		$address = btc.getAddress('wpkh', r.privateKey, network);
 		$key = btc.WIF(network).encode(r.privateKey);
 		goto('/spend');

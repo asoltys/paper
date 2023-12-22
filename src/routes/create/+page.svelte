@@ -3,7 +3,7 @@
 	import { tick } from 'svelte';
 	import * as btc from '@scure/btc-signer';
 	import { secp256k1 } from '@noble/curves/secp256k1';
-	import bip38 from 'bip38';
+  import { encryptAsync } from 'bip38';
 	import { network } from '$lib';
 	import { address, enc } from '$lib';
 
@@ -18,7 +18,7 @@
 		let pubkey = secp256k1.getPublicKey(privkey);
 
 		$address = btc.getAddress('wpkh', privkey, network);
-		$enc = await bip38.encryptAsync(privkey, true, password);
+		$enc = await encryptAsync(privkey, true, password);
 
     goto('/created');
 	};
