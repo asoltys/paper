@@ -11,12 +11,16 @@
 
 	import Address from '$lib/Address.svelte';
 
-	let sats = 100000000;
-
 	let balance,
+		fee = 0,
 		fees = {},
+		inputs = [],
+		outputs = [],
 		rate,
-		utxos;
+		sats = 100000000,
+		utxos,
+		tx,
+		txid;
 
 	let feeNames = {
 		fastestFee: 'Fastest',
@@ -26,13 +30,7 @@
 		minimumFee: 'Slowest'
 	};
 
-	key.subscribe(async (k) => {
-		if (!k) return;
-		let a = btc.getAddress('pkh', btc.WIF(network).decode(k), network);
-		let u = await fetch(`${api}/address/${a}/utxo`).then((r) => r.json());
-		let b = u.reduce((a, b) => a + b.value, 0) / sats;
-		if (b) $address = a;
-	});
+	let b = (n) => (Number(n) / sats).toFixed(8);
 
 	onMount(async () => {
 		if (!$key) goto('/');
@@ -46,14 +44,12 @@
 		rate = fees['halfHourFee'];
 	});
 
-
 	let getHex = async (txid) => {
 		if (isUint8Array(txid)) txid = uint8ArrayToHex(txid);
 		let hex = await fetch(`${api}/tx/${txid}/hex`).then((r) => r.text());
 		return hexToUint8Array(hex);
 	};
 
-	let txid;
 	let submit = async () => {
 		let amount = BigInt(Math.round(decimal * sats));
 		if (decimal > balance) throw new Error('insufficient funds');
@@ -68,21 +64,24 @@
 
 		let change = total - amount;
 
-		let tx = new btc.Transaction();
+		tx = new btc.Transaction();
 
 		for await (let { input, vout, txid } of utxos.slice(0, i)) {
 			tx.addInput({
 				txid,
 				index: vout,
-				nonWitnessUtxo: await getHex(txid)
+				nonWitnessUtxo: await getHex(txid),
+				sequence: 0xfffffffd
 			});
 		}
 
 		tx.addOutputAddress(destination, amount, network);
 		tx.addOutputAddress($address, change, network);
 
+		console.log(tx.unsignedTx.length);
+
 		while (i <= utxos.length) {
-			let fee = BigInt(rate) * BigInt(tx.unsignedTx.length);
+			fee = BigInt(rate) * BigInt(tx.unsignedTx.length * 2);
 
 			if (fee <= change) {
 				let q = new btc.Transaction();
@@ -128,9 +127,27 @@
 		let privkey = btc.WIF(network).decode($key);
 		for (let i = 0; i < tx.inputsLength; i++) {
 			tx.signIdx(privkey, 0);
-		}
-		tx.finalize();
+			let input = tx.getInput(i);
+			let utxo = input.nonWitnessUtxo.outputs[input.index];
 
+			inputs = [
+				...inputs,
+				{
+					address: btc.Address(network).encode(btc.OutScript.decode(utxo.script)),
+					amount: b(utxo.amount)
+				}
+			];
+		}
+
+		outputs = tx.outputs.map((o) => ({
+			address: btc.Address(network).encode(btc.OutScript.decode(o.script)),
+			amount: b(o.amount)
+		}));
+
+		tx.finalize();
+	};
+
+	let broadcast = async () => {
 		txid = await fetch(`${api}/tx`, {
 			method: 'POST',
 			body: tx.hex
@@ -139,22 +156,63 @@
 
 	export let data;
 
-	let decimal;
+  let decimal;
 	let destination = '';
 
-	$: max = (balance || 0)
+	$: max = balance || 0;
 
 	let format = () => {
 		if (decimal > max) decimal = max;
 		if (decimal < 0) decimal = 0;
 		decimal = parseFloat(decimal).toFixed(8);
 	};
+
+	function serialize(data) {
+		return JSON.stringify(data, (key, value) =>
+			typeof value === 'bigint' ? value.toString() : value
+		);
+	}
 </script>
 
 {#if txid}
 	<div>
 		<div class="text-gray-400 text-center">Txid</div>
 		<div class="text-2xl break-all text-center">{txid}</div>
+	</div>
+{:else if tx}
+	<div class="space-y-5">
+		<div>
+			<div class="text-gray-400 text-center">Inputs</div>
+			{#each inputs as i}
+				<div class="text-center">{i.address}: {i.amount}</div>
+			{/each}
+		</div>
+
+		<div>
+			<div class="text-gray-400 text-center">Outputs</div>
+			{#each outputs as o}
+				<div class="text-center">{o.address}: {o.amount}</div>
+			{/each}
+		</div>
+
+		<div>
+			<div class="text-gray-400 text-center">Fee</div>
+			<div class="text-center">{b(fee)}</div>
+		</div>
+
+		<div>
+			<div class="text-gray-400 text-center">Raw Hex</div>
+			<div class="text-2xl break-all text-center">{tx.hex}</div>
+		</div>
+
+
+		<button
+			type="button"
+			on:click={broadcast}
+			class="mx-auto flex gap-2 w-full md:w-60 p-4 bg-white border rounded-2xl justify-center"
+		>
+			<div class="my-auto">Broadcast</div>
+		</button>
 	</div>
 {:else}
 	<form class="text-center space-y-5" on:submit|preventDefault={submit}>
@@ -188,7 +246,7 @@
 			type="submit"
 			class="mx-auto flex gap-2 w-full md:w-60 p-4 bg-white border rounded-2xl justify-center"
 		>
-			<div class="my-auto">Withdraw</div>
+			<div class="my-auto">Preview</div>
 		</button>
 	</form>
 {/if}
