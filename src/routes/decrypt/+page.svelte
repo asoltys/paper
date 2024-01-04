@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import * as btc from '@scure/btc-signer';
-  import { decryptAsync } from 'bip38';
+  import { decryptAsync } from '@asoltys/bip38';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { address, enc, key, network } from '$lib';

@@ -10,14 +10,16 @@
     "format": "prettier --write ."
   },
   "devDependencies": {
+    "@asoltys/bip38": "^4.0.1",
     "@noble/curves": "^1.3.0",
     "@paulmillr/qr": "^0.1.1",
     "@scure/btc-signer": "^1.1.1",
     "@sveltejs/adapter-auto": "^3.0.0",
     "@sveltejs/adapter-node": "^2.0.0",
+    "@sveltejs/adapter-static": "^3.0.1",
     "@sveltejs/kit": "^2.0.0",
+    "@sveltejs/vite-plugin-svelte": "^3.0.0",
     "autoprefixer": "^10.4.16",
-    "bip38": "github:asoltys/bip38",
     "bitcoin-address-validation": "^2.2.3",
     "prettier": "^3.0.0",
     "prettier-plugin-svelte": "^3.0.0",
@@ -27,11 +29,7 @@
     "svelte-preprocess": "^5.1.1",
     "tailwindcss": "^3.3.6",
     "uint8array-extras": "^1.0.0",
-    "vite": "^5.0.0",
-    "@sveltejs/vite-plugin-svelte": "^3.0.0"
+    "vite": "^5.0.0"
   },
-  "type": "module",
-  "dependencies": {
-    "@sveltejs/adapter-static": "^3.0.1"
-  }
+  "type": "module"
 }
