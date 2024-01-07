@@ -4,8 +4,7 @@
 	import * as btc from '@scure/btc-signer';
 	import { secp256k1 } from '@noble/curves/secp256k1';
   import { encryptAsync } from '@asoltys/bip38';
-	import { network } from '$lib';
-	import { address, enc } from '$lib';
+	import { address, enc, focus, network } from '$lib';
 
 	let password;
 
