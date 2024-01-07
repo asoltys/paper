@@ -4,14 +4,17 @@
 	import decodeQR from '@paulmillr/qr/decode.js';
 	import { Bitmap } from '@paulmillr/qr';
 	import { address, enc } from '$lib';
+	import { goto } from '$app/navigation';
 
 	let addressCanvas, keyCanvas;
-      let opts = { scale: 4 };
+	let opts = { scale: 4 };
 
-	onMount(() => {
-		draw(addressCanvas, encodeQR($address, 'raw', opts));
-		draw(keyCanvas, encodeQR($enc, 'raw', opts));
-	});
+	$: if (addressCanvas && $address) draw(addressCanvas, encodeQR($address, 'raw', opts));
+	$: if (keyCanvas && $enc) draw(keyCanvas, encodeQR($enc, 'raw', opts));
+
+  onMount(() => {
+    if (!$address) goto('/create');
+  });
 
 	let draw = (canvas, bitmap) => {
 		let ctx = canvas.getContext('2d');
