@@ -14,4 +14,4 @@ Build the source with `bun build`
 
 Serve as an SPA with python:
 
-    `python3 serve_spa.py`
+    python3 serve_spa.py
