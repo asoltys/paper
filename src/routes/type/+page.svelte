@@ -2,9 +2,8 @@
 	import validate from 'bitcoin-address-validation';
 	import { focus, parse } from '$lib';
 	import Input from '$lib/Input.svelte';
-
-	let value = '';
 	let submit = () => parse(value);
+	let value = '';
 </script>
 
 <form class="text-center space-y-5" on:submit|preventDefault={submit}>

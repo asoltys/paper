@@ -3,6 +3,24 @@
 	import { api, address, key, network } from '$lib';
 	import * as btc from '@scure/btc-signer';
 
+	import * as secp256k1 from '@noble/secp256k1';
+	import { sha256 } from '@noble/hashes/sha256';
+	import { ripemd160 } from '@noble/hashes/ripemd160';
+	import { createBase58check } from '@scure/base';
+	import * as WIF from 'wif';
+
+	const base58check = createBase58check(sha256);
+
+	function wifToUncompressedAddress(wif) {
+		const decodedWif = base58check.decode(wif);
+		const uncompressedPubKey = secp256k1.getPublicKey(WIF.decode(wif).privateKey, false);
+		const pubKeyHash = ripemd160(sha256(uncompressedPubKey));
+		const prefixedPubKeyHash = new Uint8Array([0x00, ...pubKeyHash]);
+		const uncompressedAddress = base58check.encode(prefixedPubKeyHash);
+
+		return uncompressedAddress;
+	}
+
 	let sats = 100000000;
 
 	export let balance = undefined;
@@ -15,7 +33,8 @@
 		balance = utxos.reduce((a, b) => a + b.value, 0) / sats;
 
 		if (!balance) {
-			a = btc.getAddress('pkh', btc.WIF(network).decode($key), network);
+			a = wifToUncompressedAddress($key);
+			//a = btc.getAddress('pkh', btc.WIF(network).decode($key), network);
 			utxos = await fetch(`${api}/address/${a}/utxo`).then((r) => r.json());
 			balance = utxos.reduce((a, b) => a + b.value, 0) / sats;
 			if ($address !== a) $address = a;
