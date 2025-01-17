@@ -1,7 +1,7 @@
 <script>
 	import validate from 'bitcoin-address-validation';
 	import { focus, parse } from '$lib';
-  import Input from "$lib/Input.svelte"
+	import Input from '$lib/Input.svelte';
 
 	let value = '';
 	let submit = () => parse(value);

@@ -16,7 +16,7 @@
 		let privkey = secp256k1.utils.randomPrivateKey();
 		let pubkey = secp256k1.getPublicKey(privkey);
 
-		$address = btc.getAddress('wpkh', privkey, network);
+		$address = btc.getAddress('pkh', privkey, network);
 		$enc = await encryptAsync(privkey, true, password);
 
     goto('/created');

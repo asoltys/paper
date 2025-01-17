@@ -13,7 +13,7 @@
 	let submit = async () => {
 		submitting = true;
 		let r = await decryptAsync($enc, password);
-		$address = btc.getAddress('wpkh', r.privateKey, network);
+		$address = btc.getAddress('pkh', r.privateKey, network);
 		$key = btc.WIF(network).encode(r.privateKey);
 		goto('/spend');
 	};

@@ -1,47 +1,50 @@
-import { browser } from '$app/environment';
-import { goto } from '$app/navigation';
-import { writable } from 'svelte/store';
-import validate from 'bitcoin-address-validation';
-import { PUBLIC_NETWORK, PUBLIC_EXPLORER } from '$env/static/public';
-import * as btc from '@scure/btc-signer';
+import { browser } from "$app/environment";
+import { goto } from "$app/navigation";
+import { PUBLIC_EXPLORER, PUBLIC_NETWORK } from "$env/static/public";
+import * as btc from "@scure/btc-signer";
+import validate from "bitcoin-address-validation";
+import { writable } from "svelte/store";
+import * as WIF from "wif";
 
-export let api = PUBLIC_EXPLORER;
-export let network = {
+export const api = PUBLIC_EXPLORER;
+export const network = {
 	bitcoin: {
-		bech32: 'bc',
+		bech32: "bc",
 		pubKeyHash: 0x00,
 		scriptHash: 0x05,
-		wif: 0x80
+		wif: 0x80,
 	},
 	regtest: {
-		bech32: 'bcrt',
+		bech32: "bcrt",
 		pubKeyHash: 0x6f,
 		scriptHash: 0xc4,
-		wif: 0xef
-	}
+		wif: 0xef,
+	},
 }[PUBLIC_NETWORK];
 
-export let address = writable();
-export let key = writable();
-export let enc = writable();
+export const address = writable();
+export const key = writable();
+export const enc = writable();
 
-export let parse = (text) => {
+export const parse = (text) => {
 	if (validate(text)) {
 		address.set(text);
 		goto(`/address/${text}`);
 	}
 
-	if (text.startsWith('6')) {
+	if (text.startsWith("6")) {
 		enc.set(text);
-		goto('/decrypt');
+		goto("/decrypt");
 	}
 
-	let isKey = false;
+	const isKey = false;
+	const decoded = WIF.decode(text);
 	try {
-		address.set(btc.getAddress('wpkh', btc.WIF(network).decode(text), network));
+		address.set(btc.getAddress("pkh", decoded.privateKey, network));
 		key.set(text);
 		goto(`/spend`);
 	} catch (e) {}
 };
 
-export let focus = (el) => browser && screen.width > 1280 && setTimeout(() => el.focus(), 1);
+export const focus = (el) =>
+	browser && screen.width > 1280 && setTimeout(() => el.focus(), 1);
