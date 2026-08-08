@@ -4,15 +4,14 @@
 	import * as btc from '@scure/btc-signer';
 	import { secp256k1 } from '@noble/curves/secp256k1';
 	import { encryptAsync } from '@asoltys/bip38';
-	import { address, enc, focus, network, uncompressedAddress } from '$lib';
+	import { address, enc, focus, network } from '$lib';
 
 	let password;
 	let type = 'wpkh';
 
 	let types = {
-		wpkh: 'Segwit (bc1...)',
-		pkh: 'Legacy (1...)',
-		uncompressed: 'Legacy uncompressed (1...)'
+		wpkh: 'New (starts with bc1)',
+		pkh: 'Old (starts with a 1)'
 	};
 
 	let submitted;
@@ -20,13 +19,9 @@
 		submitted = true;
 		await tick();
 		let privkey = secp256k1.utils.randomPrivateKey();
-		let compressed = type !== 'uncompressed';
 
-		$address =
-			type === 'uncompressed'
-				? uncompressedAddress(privkey)
-				: btc.getAddress(type, privkey, network);
-		$enc = await encryptAsync(privkey, compressed, password);
+		$address = btc.getAddress(type, privkey, network);
+		$enc = await encryptAsync(privkey, true, password);
 
 		goto('/created');
 	};
