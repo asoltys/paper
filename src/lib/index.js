@@ -30,16 +30,17 @@ export const parse = (text) => {
 	if (validate(text)) {
 		address.set(text);
 		goto(`/address/${text}`);
+		return;
 	}
 
 	if (text.startsWith("6")) {
 		enc.set(text);
 		goto("/decrypt");
+		return;
 	}
 
-	const isKey = false;
-	const decoded = WIF.decode(text);
 	try {
+		const decoded = WIF.decode(text);
 		address.set(btc.getAddress("pkh", decoded.privateKey, network));
 		key.set(text);
 		goto(`/spend`);
