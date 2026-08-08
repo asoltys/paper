@@ -2,7 +2,8 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import * as btc from '@scure/btc-signer';
-	import { api, address, key, network } from '$lib';
+	import { address, key, network } from '$lib';
+	import * as electrum from '$lib/electrum';
 	import { redirect } from '@sveltejs/kit';
 	import { page } from '$app/stores';
 	import { invalidateAll } from '$app/navigation';
@@ -41,7 +42,7 @@
 		if (network.bech32 === 'bcrt') {
 			fees = { fastestFee: 281, halfHourFee: 271, hourFee: 256, economyFee: 44, minimumFee: 22 };
 		} else {
-			fees = await fetch(`${api}/v1/fees/recommended`).then((r) => r.json());
+			fees = await electrum.fees();
 		}
 
 		rate = fees['halfHourFee'];
@@ -49,8 +50,7 @@
 
 	let getHex = async (txid) => {
 		if (isUint8Array(txid)) txid = uint8ArrayToHex(txid);
-		let hex = await fetch(`${api}/tx/${txid}/hex`).then((r) => r.text());
-		return hexToUint8Array(hex);
+		return hexToUint8Array(await electrum.txHex(txid));
 	};
 
 	let submit = async () => {
@@ -170,10 +170,7 @@
 	};
 
 	let broadcast = async () => {
-		txid = await fetch(`${api}/tx`, {
-			method: 'POST',
-			body: hex
-		}).then((r) => r.text());
+		txid = await electrum.broadcast(hex);
 	};
 
 	export let data;
