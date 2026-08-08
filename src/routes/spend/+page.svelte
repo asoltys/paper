@@ -7,6 +7,8 @@
 	import { page } from '$app/stores';
 	import { invalidateAll } from '$app/navigation';
 	import { isUint8Array, hexToUint8Array, uint8ArrayToHex } from 'uint8array-extras';
+	import * as WIF from 'wif';
+	import { signUncompressed } from '$lib/legacy';
 	import Input from '$lib/Input.svelte';
 
 	import Address from '$lib/Address.svelte';
@@ -14,6 +16,7 @@
 	let balance,
 		fee = 0,
 		fees = {},
+		hex,
 		inputs = [],
 		outputs = [],
 		rate,
@@ -117,16 +120,17 @@
 
 				let { txid, vout } = utxos[++i];
 				tx.addInput({
-					hash: txid,
+					txid,
 					index: vout,
-					nonWitnessUtxo: await getHex(txid)
+					nonWitnessUtxo: await getHex(txid),
+					sequence: 0xfffffffd
 				});
 			}
 		}
 
-		let privkey = btc.WIF(network).decode($key);
+		let { privateKey, compressed } = WIF.decode($key, network.wif);
+
 		for (let i = 0; i < tx.inputsLength; i++) {
-			tx.signIdx(privkey, 0);
 			let input = tx.getInput(i);
 			let utxo = input.nonWitnessUtxo.outputs[input.index];
 
@@ -144,13 +148,31 @@
 			amount: b(o.amount)
 		}));
 
-		tx.finalize();
+		if (compressed) {
+			for (let i = 0; i < tx.inputsLength; i++) tx.signIdx(privateKey, i);
+			tx.finalize();
+			hex = tx.hex;
+		} else {
+			hex = signUncompressed({
+				privateKey,
+				inputs: Array.from({ length: tx.inputsLength }, (_, i) => {
+					let input = tx.getInput(i);
+					return {
+						txid: uint8ArrayToHex(input.txid),
+						vout: input.index,
+						scriptPubKey: input.nonWitnessUtxo.outputs[input.index].script,
+						sequence: input.sequence ?? 0xffffffff
+					};
+				}),
+				outputs: tx.outputs.map((o) => ({ script: o.script, amount: o.amount }))
+			});
+		}
 	};
 
 	let broadcast = async () => {
 		txid = await fetch(`${api}/tx`, {
 			method: 'POST',
-			body: tx.hex
+			body: hex
 		}).then((r) => r.text());
 	};
 
@@ -179,7 +201,7 @@
 		<div class="text-gray-400 text-center">Txid</div>
 		<div class="text-2xl break-all text-center">{txid}</div>
 	</div>
-{:else if tx}
+{:else if hex}
 	<div class="space-y-5">
 		<div>
 			<div class="text-gray-400 text-center">Inputs</div>
@@ -202,7 +224,7 @@
 
 		<div>
 			<div class="text-gray-400 text-center">Raw Hex</div>
-			<div class="text-2xl break-all text-center">{tx.hex}</div>
+			<div class="text-2xl break-all text-center">{hex}</div>
 		</div>
 
 

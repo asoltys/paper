@@ -1,11 +1,11 @@
 <script>
 	import { onMount } from 'svelte';
-	import * as btc from '@scure/btc-signer';
   import { decryptAsync } from '@asoltys/bip38';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import { address, enc, key, network } from '$lib';
+	import { address, candidates, enc, key, network } from '$lib';
 	import Password from '$lib/Password.svelte';
+	import * as WIF from 'wif';
 
 	let password;
 	let submitting;
@@ -13,8 +13,12 @@
 	let submit = async () => {
 		submitting = true;
 		let r = await decryptAsync($enc, password);
-		$address = btc.getAddress('pkh', r.privateKey, network);
-		$key = btc.WIF(network).encode(r.privateKey);
+		$key = WIF.encode({
+			version: network.wif,
+			privateKey: r.privateKey,
+			compressed: r.compressed
+		});
+		$address = candidates($key)[0].address;
 		goto('/spend');
 	};
 
